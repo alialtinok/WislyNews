@@ -105,10 +105,13 @@ struct ArticleDetailView: View {
     }
 
     private func keyVocabularySection(_ words: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let unique = words.reduce(into: [String]()) { result, w in
+            if !result.contains(where: { $0.caseInsensitiveCompare(w) == .orderedSame }) { result.append(w) }
+        }
+        return VStack(alignment: .leading, spacing: 10) {
             Text(str.keyVocabulary).font(.headline)
             FlowLayout(spacing: 8) {
-                ForEach(words, id: \.self) { word in
+                ForEach(unique, id: \.self) { word in
                     Button { tappedWord = word } label: {
                         Text(word)
                             .font(.subheadline)

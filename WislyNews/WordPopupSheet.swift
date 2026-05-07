@@ -66,18 +66,28 @@ private struct TranslationView: View {
 
     private func fetchTranslation() async {
         guard let encoded = word.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "https://api.mymemory.translated.net/get?q=\(encoded)&langpair=en|\(targetLanguageCode)")
+              let url = URL(string: "https://api.mymemory.translated.net/get?q=\(encoded)&langpair=en|\(targetLanguageCode)&de=info.alialtinok@gmail.com")
         else { isLoading = false; return }
 
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             let response  = try JSONDecoder().decode(MyMemoryResponse.self, from: data)
             let text      = response.responseData.translatedText.trimmingCharacters(in: .whitespaces)
-            translation   = text.isEmpty ? nil : text
+            translation   = isValid(text, original: word) ? text : nil
         } catch {
             translation = nil
         }
         isLoading = false
+    }
+
+    private func isValid(_ text: String, original: String) -> Bool {
+        if text.isEmpty { return false }
+        if text.caseInsensitiveCompare(original) == .orderedSame { return false }
+        if text.hasPrefix("MYMEMORY WARNING") { return false }
+        if text.contains("???") { return false }
+        if text.contains("%") { return false }
+        if !text.contains(where: { $0.isLetter || $0.isNumber }) { return false }
+        return true
     }
 }
 

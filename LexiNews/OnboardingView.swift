@@ -27,7 +27,7 @@ private struct WelcomePage: View {
             VStack(spacing: 20) {
                 Text("📰")
                     .font(.system(size: 72))
-                Text("LexiNews")
+                Text("Wisly News")
                     .font(.system(size: 42, weight: .bold, design: .serif))
                 Text("Read real news.\nLearn real English.")
                     .font(.title3)
@@ -37,8 +37,9 @@ private struct WelcomePage: View {
             Spacer()
             VStack(spacing: 12) {
                 featureRow(icon: "text.magnifyingglass",  text: "Tap any word for instant translation")
-                featureRow(icon: "chart.bar.fill",        text: "Choose your CEFR level — A2 to C2")
+                featureRow(icon: "chart.bar.fill",        text: "Choose your CEFR level — A2 to C1")
                 featureRow(icon: "flame.fill",            text: "Build a daily reading streak")
+                featureRow(icon: "graduationcap.fill",    text: "Saved words sync with Wisly automatically")
             }
             .padding(.horizontal, 32)
             Spacer()
@@ -162,11 +163,10 @@ private struct LevelPage: View {
     @EnvironmentObject private var settings: UserSettingsStore
 
     private let levels: [(CEFRLevel, String, String)] = [
-        (.A2, "Beginner",     "Basic everyday topics"),
-        (.B1, "Elementary",   "Common situations"),
-        (.B2, "Intermediate", "Wider range of topics"),
-        (.C1, "Advanced",     "Complex, detailed texts"),
-        (.C2, "Mastery",      "Near-native fluency"),
+        (.A2, "Elementary",        "Basic everyday topics"),
+        (.B1, "Intermediate",      "Common situations"),
+        (.B2, "Upper-Intermediate","Wider range of topics"),
+        (.C1, "Advanced",          "Complex, detailed texts"),
     ]
 
     var body: some View {

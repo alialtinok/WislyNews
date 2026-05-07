@@ -30,7 +30,7 @@ struct ProfileView: View {
                     LabeledContent(str.statTotalNews,    value: "\(articleStore.articles.count)")
                 }
                 Section {
-                    Link(str.privacyPolicy, destination: URL(string: "https://example.com/privacy")!)
+                    Link(str.privacyPolicy, destination: URL(string: "https://alialtinok.github.io/lexinews-privacy/")!)
                     Link(str.support,       destination: URL(string: "mailto:lexinewsapp@gmail.com")!)
                 }
             }

@@ -3,15 +3,24 @@ import Foundation
 // MARK: - CEFR Level
 
 enum CEFRLevel: String, Codable, CaseIterable, Comparable {
-    case A2, B1, B2, C1, C2
+    case A2, B1, B2, C1
 
-    private static let order: [CEFRLevel] = [.A2, .B1, .B2, .C1, .C2]
+    private static let order: [CEFRLevel] = [.A2, .B1, .B2, .C1]
 
     static func < (lhs: CEFRLevel, rhs: CEFRLevel) -> Bool {
         order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
     }
 
-    var label: String { rawValue }
+    var label: String {
+        switch self {
+        case .A2: return "Elementary"
+        case .B1: return "Intermediate"
+        case .B2: return "Upper-Intermediate"
+        case .C1: return "Advanced"
+        }
+    }
+
+    var fullName: String { label }
 }
 
 // MARK: - Article Version

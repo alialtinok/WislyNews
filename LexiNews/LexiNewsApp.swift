@@ -40,3 +40,4 @@ private struct RootView: View {
         .animation(.easeInOut(duration: 0.4), value: settings.hasCompletedOnboarding)
     }
 }
+

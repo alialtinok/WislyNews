@@ -22,7 +22,7 @@ struct HomeView: View {
                     articleList
                 }
             }
-            .navigationTitle("LexiNews")
+            .navigationTitle("Wisly News")
             .toolbar { levelPicker }
         }
     }

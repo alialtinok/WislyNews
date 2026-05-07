@@ -92,7 +92,7 @@ struct ArticleDetailView: View {
             HStack(spacing: 8) {
                 ForEach(article.availableLevels, id: \.self) { lvl in
                     Button { localLevel = lvl } label: {
-                        Text(lvl.label)
+                        Text(lvl.fullName)
                             .font(.subheadline.weight(.semibold))
                             .padding(.horizontal, 16).padding(.vertical, 7)
                             .background(activeLevel == lvl ? Color.accentColor : Color(.secondarySystemBackground))

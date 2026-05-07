@@ -11,7 +11,6 @@ enum Theme {
         case .B1: return Color(hex: "#007AFF") // blue
         case .B2: return Color(hex: "#FF9500") // orange
         case .C1: return Color(hex: "#FF3B30") // red
-        case .C2: return Color(hex: "#AF52DE") // purple
         }
     }
 

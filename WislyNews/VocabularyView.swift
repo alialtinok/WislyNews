@@ -1,32 +1,30 @@
 import SwiftUI
 
-// MARK: - LexiUp Banner
+// MARK: - Wisly Banner
 
-private struct LexiUpBanner: View {
-    private let lexiUpURL = URL(string: "lexiup://")!
-    private let appStoreURL = URL(string: "https://apps.apple.com/app/lexiup/id6741440462")!
+private struct WislyBanner: View {
+    private let appStoreURL = URL(string: "https://apps.apple.com/app/wisly-learn-english-words/id6765777781")!
 
     var body: some View {
         HStack(spacing: 14) {
-            Image("LexiUpIcon")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 36, height: 36)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.accentColor.opacity(0.15))
+                Image(systemName: "books.vertical.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color.accentColor)
+            }
+            .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 2) {
-                Text("LexiUp ile bağlı")
+                Text("Wisly ile bağlı")
                     .font(.subheadline.weight(.semibold))
-                Text("Kaydettiğin kelimeler LexiUp'ta da görünür.")
+                Text("Kaydettiğin kelimeler Wisly'de de görünür.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
             Button {
-                if UIApplication.shared.canOpenURL(lexiUpURL) {
-                    UIApplication.shared.open(lexiUpURL)
-                } else {
-                    UIApplication.shared.open(appStoreURL)
-                }
+                UIApplication.shared.open(appStoreURL)
             } label: {
                 Text("Aç")
                     .font(.caption.weight(.semibold))
@@ -86,7 +84,7 @@ struct VocabularyView: View {
                 } else {
                     List {
                         Section {
-                            LexiUpBanner()
+                            WislyBanner()
                         }
                         Section {
                             ForEach(sortedWords) { saved in

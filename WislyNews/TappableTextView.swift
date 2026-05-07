@@ -4,7 +4,7 @@ import UIKit
 struct TappableTextView: UIViewRepresentable {
     let text: String
     let savedWords: Set<String>
-    var onWordTapped: (String) -> Void
+    var onWordTapped: (String, String?) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onWordTapped: onWordTapped) }
 
@@ -63,10 +63,10 @@ struct TappableTextView: UIViewRepresentable {
     }
 
     final class Coordinator: NSObject {
-        var onWordTapped: (String) -> Void
+        var onWordTapped: (String, String?) -> Void
         weak var textView: UITextView?
 
-        init(onWordTapped: @escaping (String) -> Void) { self.onWordTapped = onWordTapped }
+        init(onWordTapped: @escaping (String, String?) -> Void) { self.onWordTapped = onWordTapped }
 
         @objc func handleTap(_ gesture: UITapGestureRecognizer) {
             guard let tv = textView else { return }
@@ -77,7 +77,15 @@ struct TappableTextView: UIViewRepresentable {
             let word = tv.text(in: wordRange) ?? ""
             let clean = word.trimmingCharacters(in: .punctuationCharacters)
             guard !clean.isEmpty, clean.rangeOfCharacter(from: .letters) != nil else { return }
-            onWordTapped(clean)
+
+            var sentence: String? = nil
+            if let sentenceRange = tv.tokenizer.rangeEnclosingPosition(position, with: .sentence, inDirection: .storage(.forward)),
+               let raw = tv.text(in: sentenceRange) {
+                let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty { sentence = trimmed }
+            }
+
+            onWordTapped(clean, sentence)
         }
     }
 }

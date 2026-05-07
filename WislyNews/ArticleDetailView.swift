@@ -9,7 +9,7 @@ struct ArticleDetailView: View {
     @EnvironmentObject private var speechService:   SpeechService
     @Environment(\.str) private var str
     @State private var localLevel: CEFRLevel? = nil
-    @State private var tappedWord: String?    = nil
+    @State private var pendingTap: PendingTap? = nil
 
     private var activeLevel: CEFRLevel { localLevel ?? settings.selectedLevel }
     private var version: ArticleVersion? { article.version(for: activeLevel) }
@@ -22,8 +22,8 @@ struct ArticleDetailView: View {
                 if let version {
                     Text(version.title).font(Theme.Font.articleTitle)
                     Divider()
-                    TappableTextView(text: version.body, savedWords: vocabularyStore.savedWords) {
-                        tappedWord = $0
+                    TappableTextView(text: version.body, savedWords: vocabularyStore.savedWordsSet) { word, sentence in
+                        pendingTap = PendingTap(word: word, sentence: sentence, articleID: article.id, articleTitle: version.title)
                     }
                     .frame(maxWidth: .infinity)
                     if !version.keyVocabulary.isEmpty {
@@ -46,10 +46,23 @@ struct ArticleDetailView: View {
         .toolbar { ttsToolbar }
         .onAppear { readingStore.markRead(articleID: article.id) }
         .onDisappear { speechService.stop() }
-        .sheet(item: $tappedWord) { word in
-            WordPopupSheet(word: word)
+        .sheet(item: $pendingTap) { tap in
+            WordPopupSheet(word: tap.word, pendingContext: tap.makeContext())
                 .environmentObject(vocabularyStore)
                 .environmentObject(settings)
+        }
+    }
+
+    struct PendingTap: Identifiable {
+        let id = UUID()
+        let word: String
+        let sentence: String?
+        let articleID: String
+        let articleTitle: String
+
+        func makeContext() -> WordContext? {
+            guard let sentence else { return nil }
+            return WordContext(sentence: sentence, articleID: articleID, articleTitle: articleTitle, capturedAt: Date())
         }
     }
 
@@ -112,7 +125,10 @@ struct ArticleDetailView: View {
             Text(str.keyVocabulary).font(.headline)
             FlowLayout(spacing: 8) {
                 ForEach(unique, id: \.self) { word in
-                    Button { tappedWord = word } label: {
+                    Button {
+                        let title = version?.title ?? article.originalTitle
+                        pendingTap = PendingTap(word: word, sentence: nil, articleID: article.id, articleTitle: title)
+                    } label: {
                         Text(word)
                             .font(.subheadline)
                             .padding(.horizontal, 12).padding(.vertical, 5)

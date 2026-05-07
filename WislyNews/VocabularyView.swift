@@ -42,6 +42,26 @@ private struct LexiUpBanner: View {
     }
 }
 
+// MARK: - Saved word row
+
+private struct SavedWordRow: View {
+    let saved: SavedWord
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(saved.word)
+                .font(.headline)
+            if let preview = saved.contexts.first?.sentence {
+                Text(preview)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
 // MARK: - VocabularyView
 
 struct VocabularyView: View {
@@ -49,6 +69,10 @@ struct VocabularyView: View {
     @EnvironmentObject private var settings: UserSettingsStore
     @Environment(\.str) private var str
     @State private var tappedWord: String? = nil
+
+    private var sortedWords: [SavedWord] {
+        store.savedWords.values.sorted(by: { $0.id < $1.id })
+    }
 
     var body: some View {
         NavigationStack {
@@ -65,12 +89,14 @@ struct VocabularyView: View {
                             LexiUpBanner()
                         }
                         Section {
-                            ForEach(store.savedWords.sorted(), id: \.self) { word in
-                                Button(word) { tappedWord = word }.foregroundStyle(.primary)
+                            ForEach(sortedWords) { saved in
+                                Button { tappedWord = saved.word } label: {
+                                    SavedWordRow(saved: saved)
+                                }
+                                .foregroundStyle(.primary)
                             }
                             .onDelete { idx in
-                                let sorted = store.savedWords.sorted()
-                                idx.forEach { store.remove(sorted[$0]) }
+                                idx.forEach { store.remove(sortedWords[$0].word) }
                             }
                         }
                     }

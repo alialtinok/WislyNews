@@ -15,7 +15,7 @@ enum ArticleServiceError: LocalizedError {
 final class ArticleService {
 
     private static let articlesURL = URL(
-        string: "https://raw.githubusercontent.com/alialtinok/lexinews-content/main/output/articles.json"
+        string: "https://raw.githubusercontent.com/alialtinok/wislynews-content/main/output/articles.json"
     )!
 
     private let decoder: JSONDecoder = {

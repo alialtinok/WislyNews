@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Shared Vocabulary Bridge (WislyNews side)
 //
 // Writes vocabulary words saved by the user in WislyNews to a shared
-// App Group container so LexiUp can read and import them.
+// App Group container so Wisly Vocabulary can read and import them.
 //
 // App Group: group.com.alialtinok.lexiapps
 // Key:       "lexiapps.sharedVocabulary"

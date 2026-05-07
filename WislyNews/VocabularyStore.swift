@@ -6,8 +6,9 @@ final class VocabularyStore: ObservableObject {
 
     @Published private(set) var savedWords: [String: SavedWord] = [:]
 
-    private let storageKey       = "lexinews.savedWords.v2"
-    private let legacyStorageKey = "lexinews.savedWords"
+    private let storageKey         = "wislynews.savedWords"
+    private let legacyDictKey      = "lexinews.savedWords.v2"
+    private let legacyStringSetKey = "lexinews.savedWords"
 
     init() { load() }
 
@@ -55,7 +56,15 @@ final class VocabularyStore: ObservableObject {
             return
         }
 
-        if let legacy = defaults.stringArray(forKey: legacyStorageKey) {
+        if let data = defaults.data(forKey: legacyDictKey),
+           let decoded = try? JSONDecoder().decode([String: SavedWord].self, from: data) {
+            savedWords = decoded
+            persist()
+            defaults.removeObject(forKey: legacyDictKey)
+            return
+        }
+
+        if let legacy = defaults.stringArray(forKey: legacyStringSetKey) {
             var dict: [String: SavedWord] = [:]
             for w in legacy {
                 let key = w.lowercased()
@@ -63,7 +72,7 @@ final class VocabularyStore: ObservableObject {
             }
             savedWords = dict
             persist()
-            defaults.removeObject(forKey: legacyStorageKey)
+            defaults.removeObject(forKey: legacyStringSetKey)
         }
     }
 

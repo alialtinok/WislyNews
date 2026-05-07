@@ -23,6 +23,8 @@ final class UserSettingsStore: ObservableObject {
 
     // MARK: Init
     init() {
+        Self.migrateLegacyKeysIfNeeded()
+
         let langID  = UserDefaults.standard.string(forKey: Keys.nativeLanguage) ?? ""
         let levelRW = UserDefaults.standard.string(forKey: Keys.selectedLevel) ?? ""
 
@@ -33,8 +35,29 @@ final class UserSettingsStore: ObservableObject {
 
     // MARK: Keys
     private enum Keys {
+        static let nativeLanguage = "wislynews.nativeLanguage"
+        static let selectedLevel  = "wislynews.selectedLevel"
+        static let onboarding     = "wislynews.onboardingDone"
+    }
+
+    private enum LegacyKeys {
         static let nativeLanguage = "lexinews.nativeLanguage"
         static let selectedLevel  = "lexinews.selectedLevel"
         static let onboarding     = "lexinews.onboardingDone"
+    }
+
+    private static func migrateLegacyKeysIfNeeded() {
+        let defaults = UserDefaults.standard
+        let pairs: [(legacy: String, new: String)] = [
+            (LegacyKeys.nativeLanguage, Keys.nativeLanguage),
+            (LegacyKeys.selectedLevel,  Keys.selectedLevel),
+            (LegacyKeys.onboarding,     Keys.onboarding),
+        ]
+        for pair in pairs {
+            guard defaults.object(forKey: pair.new) == nil,
+                  let value = defaults.object(forKey: pair.legacy) else { continue }
+            defaults.set(value, forKey: pair.new)
+            defaults.removeObject(forKey: pair.legacy)
+        }
     }
 }

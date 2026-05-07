@@ -5,7 +5,8 @@ import Combine
 final class ReadingStore: ObservableObject {
 
     @Published private(set) var readEntries: Set<String> = []
-    private let storageKey = "lexinews.readEntries"
+    private let storageKey       = "wislynews.readEntries"
+    private let legacyStorageKey = "lexinews.readEntries"
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -63,7 +64,16 @@ final class ReadingStore: ObservableObject {
     }
 
     private func load() {
-        readEntries = Set(UserDefaults.standard.stringArray(forKey: storageKey) ?? [])
+        let defaults = UserDefaults.standard
+        if let entries = defaults.stringArray(forKey: storageKey) {
+            readEntries = Set(entries)
+            return
+        }
+        if let legacy = defaults.stringArray(forKey: legacyStorageKey) {
+            readEntries = Set(legacy)
+            persist()
+            defaults.removeObject(forKey: legacyStorageKey)
+        }
     }
 
     private func persist() {

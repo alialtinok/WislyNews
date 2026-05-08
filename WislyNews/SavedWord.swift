@@ -5,6 +5,16 @@ struct WordContext: Codable, Hashable {
     let articleID: String
     let articleTitle: String
     let capturedAt: Date
+
+    static func == (lhs: WordContext, rhs: WordContext) -> Bool {
+        lhs.sentence.caseInsensitiveCompare(rhs.sentence) == .orderedSame &&
+        lhs.articleID == rhs.articleID
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(sentence.lowercased())
+        hasher.combine(articleID)
+    }
 }
 
 struct SavedWord: Codable, Identifiable, Hashable {

@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - Wisly Banner
 
 private struct WislyBanner: View {
+    private let appURL      = URL(string: "wisly://")!
     private let appStoreURL = URL(string: "https://apps.apple.com/app/wisly-learn-english-words/id6765777781")!
 
     var body: some View {
@@ -16,15 +17,22 @@ private struct WislyBanner: View {
             }
             .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Wisly ile bağlı")
+                Text("Wisly: Learn English Words")
                     .font(.subheadline.weight(.semibold))
-                Text("Kaydettiğin kelimeler Wisly'de de görünür.")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                Text("Kaydettiğin kelimeler bu uygulamada da görünür.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
-            Spacer()
+            Spacer(minLength: 8)
             Button {
-                UIApplication.shared.open(appStoreURL)
+                if UIApplication.shared.canOpenURL(appURL) {
+                    UIApplication.shared.open(appURL)
+                } else {
+                    UIApplication.shared.open(appStoreURL)
+                }
             } label: {
                 Text("Aç")
                     .font(.caption.weight(.semibold))

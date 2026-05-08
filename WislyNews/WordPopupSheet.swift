@@ -145,18 +145,45 @@ private struct TranslationView: View {
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             let response  = try JSONDecoder().decode(MyMemoryResponse.self, from: data)
-            let text      = response.responseData.translatedText.trimmingCharacters(in: .whitespaces)
-            translation   = isValid(text, original: word) ? text : nil
+            translation   = bestTranslation(from: response, original: word, targetCode: targetLanguageCode)
         } catch {
             translation = nil
         }
         isLoading = false
     }
 
+    private func bestTranslation(from response: MyMemoryResponse, original: String, targetCode: String) -> String? {
+        let target = targetCode.lowercased()
+
+        let candidates: [(text: String, quality: Double)] = (response.matches ?? []).compactMap { m in
+            guard let raw = m.translation?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  isValid(raw, original: original) else { return nil }
+            if let mTarget = m.target?.lowercased(),
+               !mTarget.isEmpty,
+               !mTarget.hasPrefix(target) {
+                return nil
+            }
+            return (raw, m.quality ?? 0)
+        }
+
+        if let best = candidates.max(by: { $0.quality < $1.quality }) {
+            return best.text
+        }
+
+        let primary = response.responseData.translatedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return isValid(primary, original: original) ? primary : nil
+    }
+
     private func isValid(_ text: String, original: String) -> Bool {
         if text.isEmpty { return false }
         if text.caseInsensitiveCompare(original) == .orderedSame { return false }
-        if text.hasPrefix("MYMEMORY WARNING") { return false }
+
+        let lettersOnly = text
+            .components(separatedBy: CharacterSet.letters.inverted)
+            .joined()
+        if lettersOnly.caseInsensitiveCompare(original) == .orderedSame { return false }
+
+        if text.uppercased().contains("MYMEMORY WARNING") { return false }
         if text.contains("???") { return false }
         if text.contains("%") { return false }
         if !text.contains(where: { $0.isLetter || $0.isNumber }) { return false }
@@ -169,9 +196,28 @@ private struct TranslationView: View {
 private struct MyMemoryResponse: Decodable {
     struct ResponseData: Decodable {
         let translatedText: String
-        enum CodingKeys: String, CodingKey {
-            case translatedText = "translatedText"
+    }
+    struct Match: Decodable {
+        let translation: String?
+        let quality: Double?
+        let target: String?
+
+        enum CodingKeys: String, CodingKey { case translation, quality, target }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            translation = try c.decodeIfPresent(String.self, forKey: .translation)
+            target      = try c.decodeIfPresent(String.self, forKey: .target)
+            if let asDouble = try? c.decodeIfPresent(Double.self, forKey: .quality) {
+                quality = asDouble
+            } else if let asString = try? c.decodeIfPresent(String.self, forKey: .quality),
+                      let parsed = Double(asString) {
+                quality = parsed
+            } else {
+                quality = nil
+            }
         }
     }
     let responseData: ResponseData
+    let matches: [Match]?
 }

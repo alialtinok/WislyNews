@@ -31,7 +31,7 @@ struct ProfileView: View {
                 }
                 Section {
                     Link(str.privacyPolicy, destination: URL(string: "https://alialtinok.github.io/wisly-privacy/")!)
-                    Link(str.support,       destination: URL(string: "mailto:lexinewsapp@gmail.com")!)
+                    Link(str.support,       destination: URL(string: "mailto:elothgoldarrow@gmail.com")!)
                 }
             }
             .navigationTitle(str.profileTitle)

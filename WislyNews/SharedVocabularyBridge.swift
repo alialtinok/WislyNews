@@ -5,8 +5,8 @@ import Foundation
 // Writes vocabulary words saved by the user in WislyNews to a shared
 // App Group container so Wisly Vocabulary can read and import them.
 //
-// App Group: group.com.alialtinok.lexiapps
-// Key:       "lexiapps.sharedVocabulary"
+// App Group: group.com.wisly.shared
+// Key:       "wisly.sharedVocabulary"
 // Format:    JSON array of SharedVocabularyItem
 
 struct SharedVocabularyItem: Codable, Identifiable {
@@ -25,8 +25,8 @@ struct SharedVocabularyItem: Codable, Identifiable {
 
 enum SharedVocabularyBridge {
 
-    private static let appGroupID  = "group.com.alialtinok.lexiapps"
-    private static let storageKey  = "lexiapps.sharedVocabulary"
+    private static let appGroupID  = "group.com.wisly.shared"
+    private static let storageKey  = "wisly.sharedVocabulary"
 
     private static var defaults: UserDefaults? {
         UserDefaults(suiteName: appGroupID)

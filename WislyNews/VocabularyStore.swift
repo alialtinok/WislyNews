@@ -9,8 +9,12 @@ final class VocabularyStore: ObservableObject {
     private let storageKey         = "wislynews.savedWords"
     private let legacyDictKey      = "lexinews.savedWords.v2"
     private let legacyStringSetKey = "lexinews.savedWords"
+    private let bridgeSyncDoneKey  = "wislynews.bridgeSyncedToWislyShared"
 
-    init() { load() }
+    init() {
+        load()
+        replayToBridgeIfNeeded()
+    }
 
     // MARK: - Convenience
 
@@ -79,5 +83,14 @@ final class VocabularyStore: ObservableObject {
     private func persist() {
         guard let data = try? JSONEncoder().encode(savedWords) else { return }
         UserDefaults.standard.set(data, forKey: storageKey)
+    }
+
+    private func replayToBridgeIfNeeded() {
+        let defaults = UserDefaults.standard
+        guard !defaults.bool(forKey: bridgeSyncDoneKey) else { return }
+        for saved in savedWords.values {
+            SharedVocabularyBridge.save(word: saved.word, languageID: "tr")
+        }
+        defaults.set(true, forKey: bridgeSyncDoneKey)
     }
 }

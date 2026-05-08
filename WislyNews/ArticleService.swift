@@ -20,10 +20,22 @@ final class ArticleService {
 
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
-        let fmt = DateFormatter()
-        fmt.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        fmt.timeZone   = TimeZone(identifier: "UTC")
-        d.dateDecodingStrategy = .formatted(fmt)
+        let isoFractional = ISO8601DateFormatter()
+        isoFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let isoPlain = ISO8601DateFormatter()
+        isoPlain.formatOptions = [.withInternetDateTime]
+        let legacy = DateFormatter()
+        legacy.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        legacy.timeZone   = TimeZone(identifier: "UTC")
+
+        d.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let raw = try container.decode(String.self)
+            if let date = isoFractional.date(from: raw) { return date }
+            if let date = isoPlain.date(from: raw)      { return date }
+            if let date = legacy.date(from: raw)        { return date }
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unrecognized date format: \(raw)")
+        }
         return d
     }()
 

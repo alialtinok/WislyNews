@@ -19,7 +19,15 @@ struct ProfileView: View {
                 Section(str.sectionLanguage) {
                     Picker(str.nativeLanguage, selection: $settings.nativeLanguage) {
                         ForEach(NativeLanguage.all) { lang in
-                            Text("\(lang.flag) \(lang.name)").tag(lang)
+                            Text("\(lang.id.uppercased())  \(lang.name)").tag(lang)
+                        }
+                    }
+                }
+                Section(str.sectionAppearance) {
+                    Picker(str.themeMode, selection: $settings.themePreference) {
+                        ForEach(AppThemePreference.allCases, id: \.self) { theme in
+                            Label(themeLabel(for: theme), systemImage: themeIcon(for: theme))
+                                .tag(theme)
                         }
                     }
                 }
@@ -58,6 +66,22 @@ struct ProfileView: View {
                 Spacer()
             }
             .padding(.vertical, 8)
+        }
+    }
+
+    private func themeLabel(for theme: AppThemePreference) -> String {
+        switch theme {
+        case .system: return str.themeSystem
+        case .light:  return str.themeLight
+        case .dark:   return str.themeDark
+        }
+    }
+
+    private func themeIcon(for theme: AppThemePreference) -> String {
+        switch theme {
+        case .system: return "circle.lefthalf.filled"
+        case .light:  return "sun.max"
+        case .dark:   return "moon"
         }
     }
 }

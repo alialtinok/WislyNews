@@ -40,6 +40,11 @@ struct AppStrings {
     let defaultLevel:     String
     let sectionLanguage:  String
     let nativeLanguage:   String
+    let sectionAppearance: String
+    let themeMode:        String
+    let themeSystem:      String
+    let themeLight:       String
+    let themeDark:        String
     let sectionStats:     String
     let statSavedWords:   String
     let statReadArticles: String
@@ -82,6 +87,11 @@ extension AppStrings {
         defaultLevel:     "Varsayılan Seviye",
         sectionLanguage:  "Dil",
         nativeLanguage:   "Ana Dil",
+        sectionAppearance: "Görünüm",
+        themeMode:        "Tema",
+        themeSystem:      "Sistem",
+        themeLight:       "Açık",
+        themeDark:        "Koyu",
         sectionStats:     "İstatistikler",
         statSavedWords:   "Kayıtlı Kelime",
         statReadArticles: "Okunan Haber",
@@ -125,6 +135,11 @@ extension AppStrings {
         defaultLevel:     "Default Level",
         sectionLanguage:  "Language",
         nativeLanguage:   "Native Language",
+        sectionAppearance: "Appearance",
+        themeMode:        "Theme",
+        themeSystem:      "System",
+        themeLight:       "Light",
+        themeDark:        "Dark",
         sectionStats:     "Statistics",
         statSavedWords:   "Saved Words",
         statReadArticles: "Articles Read",

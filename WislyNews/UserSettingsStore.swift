@@ -17,6 +17,10 @@ final class UserSettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(selectedLevel.rawValue, forKey: Keys.selectedLevel) }
     }
 
+    @Published var themePreference: AppThemePreference {
+        didSet { UserDefaults.standard.set(themePreference.rawValue, forKey: Keys.themePreference) }
+    }
+
     @Published var hasCompletedOnboarding: Bool {
         didSet { UserDefaults.standard.set(hasCompletedOnboarding, forKey: Keys.onboarding) }
     }
@@ -27,9 +31,11 @@ final class UserSettingsStore: ObservableObject {
 
         let langID  = UserDefaults.standard.string(forKey: Keys.nativeLanguage) ?? ""
         let levelRW = UserDefaults.standard.string(forKey: Keys.selectedLevel) ?? ""
+        let themeRW = UserDefaults.standard.string(forKey: Keys.themePreference) ?? ""
 
         nativeLanguage         = NativeLanguage.find(id: langID)
         selectedLevel          = CEFRLevel(rawValue: levelRW) ?? .B1
+        themePreference        = AppThemePreference(rawValue: themeRW) ?? .system
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: Keys.onboarding)
     }
 
@@ -37,6 +43,7 @@ final class UserSettingsStore: ObservableObject {
     private enum Keys {
         static let nativeLanguage = "wislynews.nativeLanguage"
         static let selectedLevel  = "wislynews.selectedLevel"
+        static let themePreference = "wislynews.themePreference"
         static let onboarding     = "wislynews.onboardingDone"
     }
 

@@ -37,7 +37,7 @@ private struct RootView: View {
             }
         }
         .environment(\.str, AppStrings.from(settings.nativeLanguage))
+        .preferredColorScheme(settings.themePreference.colorScheme)
         .animation(.easeInOut(duration: 0.4), value: settings.hasCompletedOnboarding)
     }
 }
-

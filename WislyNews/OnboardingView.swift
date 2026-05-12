@@ -25,8 +25,7 @@ private struct WelcomePage: View {
         VStack(spacing: 0) {
             Spacer()
             VStack(spacing: 20) {
-                Text("📰")
-                    .font(.system(size: 72))
+                OnboardingIconBadge(systemName: "newspaper.fill", size: 56)
                 Text("Wisly News")
                     .font(.system(size: 42, weight: .bold, design: .serif))
                 Text("Read real news.\nLearn real English.")
@@ -36,10 +35,10 @@ private struct WelcomePage: View {
             }
             Spacer()
             VStack(spacing: 12) {
-                featureRow(icon: "text.magnifyingglass",  text: "Tap any word for instant translation")
+                featureRow(icon: "magnifyingglass",       text: "Tap any word for instant translation")
                 featureRow(icon: "chart.bar.fill",        text: "Choose your CEFR level — A2 to C1")
                 featureRow(icon: "flame.fill",            text: "Build a daily reading streak")
-                featureRow(icon: "graduationcap.fill",    text: "Saved words sync with Wisly automatically")
+                featureRow(icon: "bookmark.fill",         text: "Saved words sync with Wisly automatically")
             }
             .padding(.horizontal, 32)
             Spacer()
@@ -82,8 +81,7 @@ private struct LanguagePage: View {
         VStack(spacing: 0) {
             Spacer()
             VStack(spacing: 8) {
-                Text("🌍")
-                    .font(.system(size: 56))
+                OnboardingIconBadge(systemName: "a.square", size: 44)
                 Text("Your language")
                     .font(.system(size: 28, weight: .bold))
                 Text("Translations will appear in\nyour native language.")
@@ -130,7 +128,7 @@ private struct LanguageCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                Text(language.flag).font(.title)
+                LanguageCodeBadge(code: language.id.uppercased())
                 VStack(alignment: .leading, spacing: 2) {
                     Text(language.name).font(.headline)
                     Text(language.nameInEnglish).font(.caption).foregroundStyle(.secondary)
@@ -173,8 +171,7 @@ private struct LevelPage: View {
         VStack(spacing: 0) {
             Spacer()
             VStack(spacing: 8) {
-                Text("📊")
-                    .font(.system(size: 56))
+                OnboardingIconBadge(systemName: "chart.bar.fill", size: 44)
                 Text("Your level")
                     .font(.system(size: 28, weight: .bold))
                 Text("You can change this anytime.")
@@ -257,5 +254,36 @@ private struct LevelCard: View {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct OnboardingIconBadge: View {
+    let systemName: String
+    let size: CGFloat
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.accentColor, lineWidth: 2.5)
+                .frame(width: size, height: size)
+            Image(systemName: systemName)
+                .font(.system(size: size * 0.5, weight: .semibold))
+                .foregroundStyle(Color.accentColor)
+        }
+    }
+}
+
+private struct LanguageCodeBadge: View {
+    let code: String
+
+    var body: some View {
+        Text(code)
+            .font(.system(.subheadline, design: .rounded, weight: .bold))
+            .foregroundStyle(Color.accentColor)
+            .frame(width: 42, height: 42)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.accentColor.opacity(0.12))
+            )
     }
 }

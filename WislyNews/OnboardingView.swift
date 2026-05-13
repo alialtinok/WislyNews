@@ -11,6 +11,7 @@ struct OnboardingView: View {
             LevelPage().tag(2)
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
+        .preferredColorScheme(.dark)
         .ignoresSafeArea()
         .animation(.easeInOut, value: page)
     }
@@ -22,16 +23,19 @@ private struct WelcomePage: View {
     @Binding var page: Int
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-            VStack(spacing: 20) {
-                OnboardingIconBadge(systemName: "newspaper.fill", size: 56)
+        ZStack {
+            WislyBackground()
+            VStack(spacing: 0) {
+                Spacer(minLength: 28)
+                VStack(spacing: 20) {
+                NeonIconBadge(systemName: "newspaper.fill", size: 64)
                 Text("Wisly News")
                     .font(.system(size: 42, weight: .bold, design: .serif))
+                    .foregroundStyle(.white)
                 Text("Read real news.\nLearn real English.")
                     .font(.title3)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
             Spacer()
             VStack(spacing: 12) {
@@ -42,17 +46,10 @@ private struct WelcomePage: View {
             }
             .padding(.horizontal, 32)
             Spacer()
-            Button { withAnimation { page = 1 } } label: {
-                Text("Get Started")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
+            NeonPrimaryButton(title: "Get Started") { withAnimation { page = 1 } }
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
+            }
         }
     }
 
@@ -64,7 +61,7 @@ private struct WelcomePage: View {
                 .frame(width: 28)
             Text(text)
                 .font(.subheadline)
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white.opacity(0.86))
             Spacer()
         }
         .padding(.vertical, 4)
@@ -78,16 +75,19 @@ private struct LanguagePage: View {
     @Binding var page: Int
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-            VStack(spacing: 8) {
-                OnboardingIconBadge(systemName: "a.square", size: 44)
+        ZStack {
+            WislyBackground()
+            VStack(spacing: 0) {
+                Spacer()
+                VStack(spacing: 12) {
+                NeonIconBadge(systemName: "globe", size: 72)
                 Text("Your language")
                     .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(.white)
                 Text("Translations will appear in\nyour native language.")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.68))
             }
             .padding(.bottom, 32)
 
@@ -105,17 +105,10 @@ private struct LanguagePage: View {
 
             Spacer()
 
-            Button { withAnimation { page = 2 } } label: {
-                Text("Continue")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
+            NeonPrimaryButton(title: "Continue") { withAnimation { page = 2 } }
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
+            }
         }
     }
 }
@@ -128,10 +121,10 @@ private struct LanguageCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                LanguageCodeBadge(code: language.id.uppercased())
+                LanguageCodeBadge(language: language)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(language.name).font(.headline)
-                    Text(language.nameInEnglish).font(.caption).foregroundStyle(.secondary)
+                    Text(language.name).font(.headline).foregroundStyle(.white)
+                    Text(language.nameInEnglish).font(.caption).foregroundStyle(.white.opacity(0.62))
                 }
                 Spacer()
                 if isSelected {
@@ -142,14 +135,7 @@ private struct LanguageCard: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? Color.accentColor.opacity(0.1) : Color(.secondarySystemBackground))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
-                    )
-            )
+            .glassPanel(cornerRadius: 16, isSelected: isSelected)
         }
         .buttonStyle(.plain)
     }
@@ -168,15 +154,18 @@ private struct LevelPage: View {
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-            VStack(spacing: 8) {
-                OnboardingIconBadge(systemName: "chart.bar.fill", size: 44)
+        ZStack {
+            WislyBackground()
+            VStack(spacing: 0) {
+                Spacer()
+                VStack(spacing: 12) {
+                NeonIconBadge(systemName: "chart.bar.fill", size: 72)
                 Text("Your level")
                     .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(.white)
                 Text("You can change this anytime.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.68))
             }
             .padding(.bottom, 28)
 
@@ -196,19 +185,12 @@ private struct LevelPage: View {
 
             Spacer()
 
-            Button {
+            NeonPrimaryButton(title: "Start Reading") {
                 settings.hasCompletedOnboarding = true
-            } label: {
-                Text("Start Reading")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
+            }
         }
     }
 }
@@ -232,8 +214,8 @@ private struct LevelCard: View {
                             .fill(isSelected ? Theme.levelColor(level) : Theme.levelColor(level).opacity(0.12))
                     )
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(label).font(.subheadline.weight(.semibold))
-                    Text(description).font(.caption).foregroundStyle(.secondary)
+                    Text(label).font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                    Text(description).font(.caption).foregroundStyle(.white.opacity(0.62))
                 }
                 Spacer()
                 if isSelected {
@@ -244,46 +226,40 @@ private struct LevelCard: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? Color.accentColor.opacity(0.08) : Color(.secondarySystemBackground))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
-                    )
-            )
+            .glassPanel(cornerRadius: 14, isSelected: isSelected)
         }
         .buttonStyle(.plain)
     }
 }
 
-private struct OnboardingIconBadge: View {
-    let systemName: String
-    let size: CGFloat
+private struct LanguageCodeBadge: View {
+    let language: NativeLanguage
 
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.accentColor, lineWidth: 2.5)
-                .frame(width: size, height: size)
-            Image(systemName: systemName)
-                .font(.system(size: size * 0.5, weight: .semibold))
-                .foregroundStyle(Color.accentColor)
+    private var symbol: String {
+        switch language.id {
+        case "tr": return "moon.stars.fill"
+        case "fr": return "a.square.fill"
+        case "ru": return "building.columns.fill"
+        case "de": return "building.columns"
+        case "ar": return "crescentmoon.fill"
+        case "es": return "sun.max.fill"
+        default:   return "a.square"
         }
     }
-}
 
-private struct LanguageCodeBadge: View {
-    let code: String
+    private var tint: Color {
+        switch language.id {
+        case "tr": return Color(hex: "#FF3448")
+        case "fr": return Theme.electricBlue
+        case "ru": return Theme.purpleGlow
+        case "de": return Theme.orangeGlow
+        case "ar": return Color(hex: "#28C76F")
+        case "es": return Color(hex: "#FFC400")
+        default:   return Theme.electricBlue
+        }
+    }
 
     var body: some View {
-        Text(code)
-            .font(.system(.subheadline, design: .rounded, weight: .bold))
-            .foregroundStyle(Color.accentColor)
-            .frame(width: 42, height: 42)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.accentColor.opacity(0.12))
-            )
+        NeonIconBadge(systemName: symbol, tint: tint, size: 48)
     }
 }

@@ -15,35 +15,45 @@ struct ArticleDetailView: View {
     private var version: ArticleVersion? { article.version(for: activeLevel) }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                CategoryPill(category: article.category)
-                levelSwitcher
-                if let version {
-                    Text(version.title).font(Theme.Font.articleTitle)
-                    Divider()
-                    TappableTextView(text: version.body, savedWords: vocabularyStore.savedWordsSet) { word, sentence in
-                        pendingTap = PendingTap(word: word, sentence: sentence, articleID: article.id, articleTitle: version.title)
+        ZStack {
+            WislyBackground()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    CategoryPill(category: article.category)
+                    levelSwitcher
+                    if let version {
+                        Text(version.title)
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                        Divider().overlay(Theme.hairline)
+                        TappableTextView(text: version.body, savedWords: vocabularyStore.savedWordsSet) { word, sentence in
+                            pendingTap = PendingTap(word: word, sentence: sentence, articleID: article.id, articleTitle: version.title)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(14)
+                        .glassPanel(cornerRadius: 18)
+                        if !version.keyVocabulary.isEmpty {
+                            keyVocabularySection(version.keyVocabulary)
+                        }
+                    } else {
+                        Text(str.noContent).foregroundStyle(.white.opacity(0.65))
                     }
-                    .frame(maxWidth: .infinity)
-                    if !version.keyVocabulary.isEmpty {
-                        keyVocabularySection(version.keyVocabulary)
+                    if let url = URL(string: article.originalURL) {
+                        Link(destination: url) {
+                            Label(str.readOriginal, systemImage: "arrow.up.right.square").font(.footnote.weight(.semibold))
+                        }
+                        .foregroundStyle(Theme.electricBlue)
+                        .padding(.top, 8)
                     }
-                } else {
-                    Text(str.noContent).foregroundStyle(.secondary)
                 }
-                if let url = URL(string: article.originalURL) {
-                    Link(destination: url) {
-                        Label(str.readOriginal, systemImage: "arrow.up.right.square").font(.footnote)
-                    }
-                    .padding(.top, 8)
-                }
+                .padding()
             }
-            .padding()
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar { ttsToolbar }
+        .preferredColorScheme(.dark)
         .onAppear { readingStore.markRead(articleID: article.id) }
         .onDisappear { speechService.stop() }
         .sheet(item: $pendingTap) { tap in
@@ -108,9 +118,10 @@ struct ArticleDetailView: View {
                         Text(lvl.fullName)
                             .font(.subheadline.weight(.semibold))
                             .padding(.horizontal, 16).padding(.vertical, 7)
-                            .background(activeLevel == lvl ? Color.accentColor : Color(.secondarySystemBackground))
-                            .foregroundStyle(activeLevel == lvl ? .white : .primary)
+                            .background(activeLevel == lvl ? Theme.electricBlue : Theme.glass)
+                            .foregroundStyle(activeLevel == lvl ? .white : .white.opacity(0.82))
                             .clipShape(Capsule())
+                            .overlay(Capsule().stroke(activeLevel == lvl ? Theme.electricBlue : Theme.hairline, lineWidth: 1))
                     }
                 }
             }
@@ -123,6 +134,7 @@ struct ArticleDetailView: View {
         }
         return VStack(alignment: .leading, spacing: 10) {
             Text(str.keyVocabulary).font(.headline)
+                .foregroundStyle(.white)
             FlowLayout(spacing: 8) {
                 ForEach(unique, id: \.self) { word in
                     Button {
@@ -134,11 +146,12 @@ struct ArticleDetailView: View {
                             .padding(.horizontal, 12).padding(.vertical, 5)
                             .background(
                                 vocabularyStore.isSaved(word)
-                                    ? Color.accentColor.opacity(0.15)
-                                    : Color(.secondarySystemBackground)
+                                    ? Theme.electricBlue.opacity(0.2)
+                                    : Theme.glass
                             )
-                            .foregroundStyle(vocabularyStore.isSaved(word) ? Color.accentColor : .primary)
+                            .foregroundStyle(vocabularyStore.isSaved(word) ? Theme.electricBlue : .white.opacity(0.82))
                             .clipShape(Capsule())
+                            .overlay(Capsule().stroke(vocabularyStore.isSaved(word) ? Theme.electricBlue : Theme.hairline, lineWidth: 1))
                     }
                 }
             }

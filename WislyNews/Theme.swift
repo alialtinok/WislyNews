@@ -2,21 +2,16 @@ import SwiftUI
 
 // MARK: - App Theme
 
-enum AppThemePreference: String, Codable, CaseIterable {
-    case system
-    case light
-    case dark
-
-    var colorScheme: ColorScheme? {
-        switch self {
-        case .system: return nil
-        case .light:  return .light
-        case .dark:   return .dark
-        }
-    }
-}
-
 enum Theme {
+    static let backgroundTop = Color(hex: "#040815")
+    static let backgroundBottom = Color(hex: "#07142B")
+    static let electricBlue = Color(hex: "#0A74FF")
+    static let cyanGlow = Color(hex: "#00B7FF")
+    static let purpleGlow = Color(hex: "#8E4DFF")
+    static let orangeGlow = Color(hex: "#FF8A00")
+    static let glass = Color.white.opacity(0.09)
+    static let glassStrong = Color.white.opacity(0.14)
+    static let hairline = Color.white.opacity(0.18)
 
     // MARK: Level colors
     static func levelColor(_ level: CEFRLevel) -> Color {
@@ -47,6 +42,98 @@ enum Theme {
         static let cardBody     = SwiftUI.Font.system(.subheadline, design: .default,   weight: .regular)
         static let articleTitle = SwiftUI.Font.system(.title2,      design: .serif,     weight: .bold)
         static let articleBody  = SwiftUI.Font.system(size: 17,     weight: .regular, design: .default)
+    }
+}
+
+// MARK: - Neon theme building blocks
+
+struct WislyBackground: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Theme.backgroundTop, Theme.backgroundBottom, Color.black],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            LinearGradient(
+                colors: [Theme.electricBlue.opacity(0.16), .clear],
+                startPoint: .topTrailing,
+                endPoint: .center
+            )
+        }
+        .ignoresSafeArea()
+    }
+}
+
+struct GlassPanel: ViewModifier {
+    var cornerRadius: CGFloat = 18
+    var isSelected: Bool = false
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(isSelected ? Theme.electricBlue.opacity(0.16) : Theme.glass)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .stroke(isSelected ? Theme.electricBlue : Theme.hairline, lineWidth: isSelected ? 1.4 : 1)
+                    )
+                    .shadow(color: isSelected ? Theme.electricBlue.opacity(0.35) : .black.opacity(0.2),
+                            radius: isSelected ? 14 : 8,
+                            x: 0,
+                            y: 6)
+            )
+    }
+}
+
+extension View {
+    func glassPanel(cornerRadius: CGFloat = 18, isSelected: Bool = false) -> some View {
+        modifier(GlassPanel(cornerRadius: cornerRadius, isSelected: isSelected))
+    }
+}
+
+struct NeonIconBadge: View {
+    let systemName: String
+    var tint: Color = Theme.electricBlue
+    var size: CGFloat = 56
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.24, style: .continuous)
+                .fill(tint.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: size * 0.24, style: .continuous)
+                        .stroke(tint, lineWidth: 1.6)
+                )
+                .shadow(color: tint.opacity(0.42), radius: 12)
+            Image(systemName: systemName)
+                .font(.system(size: size * 0.46, weight: .bold))
+                .foregroundStyle(tint)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+struct NeonPrimaryButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.headline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 15)
+                .background(
+                    LinearGradient(colors: [Theme.electricBlue, Color(hex: "#145BFF")],
+                                   startPoint: .topLeading,
+                                   endPoint: .bottomTrailing)
+                )
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .shadow(color: Theme.electricBlue.opacity(0.45), radius: 18, y: 8)
+        }
+        .buttonStyle(.plain)
     }
 }
 

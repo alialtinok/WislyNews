@@ -4,47 +4,50 @@ import SwiftUI
 
 private struct WislyBanner: View {
     private let appURL      = URL(string: "wisly://")!
-    private let appStoreURL = URL(string: "https://apps.apple.com/app/wisly-learn-english-words/id6765777781")!
+    private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id6765777781")!
 
     var body: some View {
         HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.accentColor.opacity(0.15))
-                Image(systemName: "books.vertical.fill")
-                    .font(.title3)
-                    .foregroundStyle(Color.accentColor)
-            }
-            .frame(width: 36, height: 36)
+            NeonIconBadge(systemName: "books.vertical.fill", size: 46)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Wisly: Learn English Words")
                     .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
                 Text("Kaydettiğin kelimeler bu uygulamada da görünür.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.66))
                     .lineLimit(2)
             }
             Spacer(minLength: 8)
             Button {
-                if UIApplication.shared.canOpenURL(appURL) {
-                    UIApplication.shared.open(appURL)
-                } else {
-                    UIApplication.shared.open(appStoreURL)
-                }
+                openWisly()
             } label: {
                 Text("Aç")
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.12))
-                    .foregroundStyle(Color.accentColor)
+                    .background(Theme.electricBlue)
+                    .foregroundStyle(.white)
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .glassPanel(cornerRadius: 18, isSelected: true)
+    }
+
+    private func openWisly() {
+        if UIApplication.shared.canOpenURL(appURL) {
+            UIApplication.shared.open(appURL) { didOpen in
+                if !didOpen {
+                    UIApplication.shared.open(appStoreURL)
+                }
+            }
+        } else {
+            UIApplication.shared.open(appStoreURL)
+        }
     }
 }
 
@@ -57,14 +60,15 @@ private struct SavedWordRow: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(saved.word)
                 .font(.headline)
+                .foregroundStyle(.white)
             if let preview = saved.contexts.first?.sentence {
                 Text(preview)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.66))
                     .lineLimit(2)
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 10)
     }
 }
 
@@ -82,34 +86,53 @@ struct VocabularyView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
+                WislyBackground()
                 if store.savedWords.isEmpty {
-                    ContentUnavailableView(
-                        str.vocabEmpty,
-                        systemImage: "books.vertical",
-                        description: Text(str.vocabEmptyDesc)
-                    )
+                    VStack(spacing: 14) {
+                        NeonIconBadge(systemName: "books.vertical", size: 64)
+                        Text(str.vocabEmpty)
+                            .font(.title2.bold())
+                            .foregroundStyle(.white)
+                        Text(str.vocabEmptyDesc)
+                            .font(.subheadline)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.white.opacity(0.66))
+                    }
+                    .padding()
                 } else {
-                    List {
-                        Section {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text(str.tabMyWords)
+                                .font(.system(size: 34, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
                             WislyBanner()
-                        }
-                        Section {
                             ForEach(sortedWords) { saved in
                                 Button { tappedWord = saved.word } label: {
                                     SavedWordRow(saved: saved)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal, 14)
+                                        .glassPanel(cornerRadius: 14)
                                 }
-                                .foregroundStyle(.primary)
-                            }
-                            .onDelete { idx in
-                                idx.forEach { store.remove(sortedWords[$0].word) }
+                                .buttonStyle(.plain)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        store.remove(saved.word)
+                                    } label: {
+                                        Label("Sil", systemImage: "trash")
+                                    }
+                                }
                             }
                         }
+                        .padding()
                     }
                 }
             }
-            .navigationTitle(str.tabMyWords)
+            .navigationTitle("")
+            .toolbar(.hidden, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
+        .preferredColorScheme(.dark)
         .sheet(item: $tappedWord) { word in
             WordPopupSheet(word: word)
                 .environmentObject(store)

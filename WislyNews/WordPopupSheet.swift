@@ -19,42 +19,53 @@ struct WordPopupSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                Text(word).font(.system(size: 36, weight: .bold)).padding(.top, 8)
-                Divider()
-                TranslationView(word: word,
-                                targetLanguageCode: settings.nativeLanguage.translationCode,
-                                missingLabel: str.translationMissing)
+            ZStack {
+                WislyBackground()
+                VStack(spacing: 16) {
+                    Text(word)
+                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.top, 8)
+                    TranslationView(word: word,
+                                    targetLanguageCode: settings.nativeLanguage.translationCode,
+                                    missingLabel: str.translationMissing)
 
-                if !displayContexts.isEmpty {
-                    contextSection
-                }
-
-                Spacer(minLength: 8)
-
-                Button {
-                    let langID = settings.nativeLanguage.id
-                    if vocabularyStore.isSaved(word) {
-                        vocabularyStore.remove(word, languageID: langID)
-                    } else {
-                        vocabularyStore.save(word, context: pendingContext, languageID: langID)
+                    if !displayContexts.isEmpty {
+                        contextSection
                     }
-                } label: {
-                    Label(
-                        vocabularyStore.isSaved(word) ? str.removeWord : str.saveWord,
-                        systemImage: vocabularyStore.isSaved(word) ? "bookmark.slash" : "bookmark"
-                    )
-                    .frame(maxWidth: .infinity)
+
+                    Spacer(minLength: 8)
+
+                    Button {
+                        let langID = settings.nativeLanguage.id
+                        if vocabularyStore.isSaved(word) {
+                            vocabularyStore.remove(word, languageID: langID)
+                        } else {
+                            vocabularyStore.save(word, context: pendingContext, languageID: langID)
+                        }
+                    } label: {
+                        Label(
+                            vocabularyStore.isSaved(word) ? str.removeWord : str.saveWord,
+                            systemImage: vocabularyStore.isSaved(word) ? "bookmark.slash" : "bookmark"
+                        )
+                        .font(.headline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(vocabularyStore.isSaved(word) ? Color.red.opacity(0.85) : Theme.electricBlue)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal).padding(.bottom, 8)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(vocabularyStore.isSaved(word) ? .red : .accentColor)
-                .padding(.horizontal).padding(.bottom, 8)
+                .padding()
             }
-            .padding()
             .navigationTitle(str.wordTitle)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button(str.closeButton) { dismiss() } } }
         }
+        .preferredColorScheme(.dark)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
     }
@@ -80,14 +91,14 @@ private struct ContextRow: View {
             Text(highlighted(context.sentence, word: word))
                 .font(.callout)
                 .multilineTextAlignment(.leading)
+                .foregroundStyle(.white.opacity(0.86))
             Text(context.articleTitle)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.58))
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .glassPanel(cornerRadius: 12)
     }
 
     private func highlighted(_ sentence: String, word: String) -> AttributedString {
@@ -125,13 +136,15 @@ private struct TranslationView: View {
         VStack(spacing: 8) {
             if isLoading {
                 ProgressView()
+                    .tint(.white)
             } else if let tr = translation {
                 Text(tr)
                     .font(.title2.weight(.medium))
                     .multilineTextAlignment(.center)
+                    .foregroundStyle(Theme.purpleGlow)
             } else {
                 Text(missingLabel)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.62))
             }
         }
         .task { await fetchTranslation() }

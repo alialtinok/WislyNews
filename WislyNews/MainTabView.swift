@@ -12,5 +12,9 @@ struct MainTabView: View {
             ProfileView()
                 .tabItem { Label(str.tabProfile, systemImage: "person") }
         }
+        .tint(Theme.electricBlue)
+        .preferredColorScheme(.dark)
+        .toolbarBackground(Theme.backgroundTop, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
     }
 }
